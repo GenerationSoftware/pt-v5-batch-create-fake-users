@@ -5,6 +5,9 @@
   "author": "PoolTogether Inc.",
   "homepage": "https://github.com/pooltogether/v5-batch-create-fake-users/README.md",
   "license": "ISC",
+  "workspaces": [
+    ".yalc/@*/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pooltogether/v5-batch-create-fake-users.git"
@@ -13,7 +16,8 @@
   "main": "./index",
   "type": "module",
   "scripts": {
-    "start": "ts-node --esm --experimental-specifier-resolution=node ./index.ts"
+    "start": "ts-node --esm --experimental-specifier-resolution=node ./index.ts",
+    "yalcadd": "npx yalc add @pooltogether/v5-utils-js --pure"
   },
   "bugs": {
     "url": "https://github.com/pooltogether/v5-autotasks/issues"
