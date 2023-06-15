@@ -3,11 +3,15 @@ import { getSubgraphVaults, populateSubgraphVaultAccounts } from "@pooltogether/
 
 import { userFakerAbi } from "./abis/userFakerAbi";
 
-const USER_FAKER_ADDRESS = "0xb02BB09C774a1eccA01259F68373894f6eFE7164";
+const CHAIN_ID = 11155111; // sepolia
 
+const USER_FAKER_ADDRESS = "0xb02BB09C774a1eccA01259F68373894f6eFE7164";
 const TOKEN_FAUCET_ADDRESS = "0x7c01a0343595403422190C6Af9a3342c8b2Dc4C7";
 
-const CHAIN_ID = 11155111; // sepolia
+const OMITTED_VAULTS = [
+  "0xd6d82beb1243a254a61ae4b3a1936da962f947b7",
+  "0x7ea2e76587962c526b60492bd8342aae859f1219"
+];
 
 const getVaults = async (chainId: number) => {
   let vaults = await getSubgraphVaults(chainId);
@@ -35,12 +39,15 @@ export async function main() {
 
   const userFaker = new ethers.Contract(USER_FAKER_ADDRESS, userFakerAbi, signer);
 
-  const vaults = await getVaults(CHAIN_ID);
+  let vaults: any = await getVaults(CHAIN_ID);
 
   for (let i = 0; i < vaults.length; i++) {
     try {
       console.log("");
       const vault = vaults[i];
+      if (OMITTED_VAULTS.includes(vault.id)) {
+        continue;
+      }
 
       console.log("Vault ID:", vault.id);
 
