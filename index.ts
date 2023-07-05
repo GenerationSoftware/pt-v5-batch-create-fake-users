@@ -8,9 +8,9 @@ const CHAIN_ID = 11155111; // sepolia
 const USER_FAKER_ADDRESS = "0xb02BB09C774a1eccA01259F68373894f6eFE7164";
 const TOKEN_FAUCET_ADDRESS = "0x7c01a0343595403422190C6Af9a3342c8b2Dc4C7";
 
-const OMITTED_VAULTS = [
-  "0xd6d82beb1243a254a61ae4b3a1936da962f947b7",
-  "0x7ea2e76587962c526b60492bd8342aae859f1219"
+const SELECTED_VAULTS = [
+  "0x0b87bf0822afaecdeb367cfaaccf40c0e895f3ad" // usdc
+  // "0x0c393c363bae8eebe6e1afe4716e317cbd2e9949" //  dai
 ];
 
 const getVaults = async (chainId: number) => {
@@ -45,7 +45,7 @@ export async function main() {
     try {
       console.log("");
       const vault = vaults[i];
-      if (OMITTED_VAULTS.includes(vault.id)) {
+      if (!SELECTED_VAULTS.includes(vault.id)) {
         continue;
       }
 
@@ -54,7 +54,7 @@ export async function main() {
       const vaultUserCount = vault.accounts.length;
       console.log("Existing vault depositors count:", vaultUserCount);
 
-      const numToAdd = getRandomInt(30, 50);
+      const numToAdd = getRandomInt(50, 51);
       console.log("# of depositors to add:", numToAdd);
 
       const numUsers = vaultUserCount + numToAdd;
