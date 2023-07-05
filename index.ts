@@ -1,15 +1,19 @@
 import { ethers, providers } from "ethers";
-import { getSubgraphVaults, populateSubgraphVaultAccounts } from "@pooltogether/v5-utils-js";
+import {
+  getSubgraphVaults,
+  populateSubgraphVaultAccounts
+} from "@generationsoftware/pt-v5-utils-js";
 
 import { userFakerAbi } from "./abis/userFakerAbi";
 
 const CHAIN_ID = 11155111; // sepolia
 
 const USER_FAKER_ADDRESS = "0xb02BB09C774a1eccA01259F68373894f6eFE7164";
-const TOKEN_FAUCET_ADDRESS = "0x7c01a0343595403422190C6Af9a3342c8b2Dc4C7";
+const TOKEN_FAUCET_ADDRESS = "0x7De5077DfA7B87038710c3782d1Dfd76261562BC";
 
+// NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
 const SELECTED_VAULTS = [
-  "0x0b87bf0822afaecdeb367cfaaccf40c0e895f3ad" // usdc
+  "0x0ec780be0191f8a364faccde91d13be6f96632be" // usdc
   // "0x0c393c363bae8eebe6e1afe4716e317cbd2e9949" //  dai
 ];
 
