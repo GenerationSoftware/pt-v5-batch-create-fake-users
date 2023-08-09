@@ -9,11 +9,11 @@ import { userFakerAbi } from "./abis/userFakerAbi";
 const CHAIN_ID = 11155111; // sepolia
 
 const USER_FAKER_ADDRESS = "0xb02BB09C774a1eccA01259F68373894f6eFE7164";
-const TOKEN_FAUCET_ADDRESS = "0x7De5077DfA7B87038710c3782d1Dfd76261562BC";
+const TOKEN_FAUCET_ADDRESS = "0xcB0A8a7A1d37e35881461a3971148Dd432746401";
 
 // NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
 const SELECTED_VAULTS = [
-  "0x0ec780be0191f8a364faccde91d13be6f96632be" // usdc
+  "0xb634839AC5c7DDCF8523ba7Cc2a9211F4f107423" // usdc
   // "0x0c393c363bae8eebe6e1afe4716e317cbd2e9949" //  dai
 ];
 
@@ -42,8 +42,12 @@ export async function main() {
   const signer = new ethers.Wallet(privateKey, provider);
 
   const userFaker = new ethers.Contract(USER_FAKER_ADDRESS, userFakerAbi, signer);
+  console.log(userFaker);
 
-  let vaults: any = await getVaults(CHAIN_ID);
+  // let vaults: any = await getVaults(CHAIN_ID);
+  // console.log(vaults);
+
+  let vaults = [{ id: "0xb634839AC5c7DDCF8523ba7Cc2a9211F4f107423" }];
 
   for (let i = 0; i < vaults.length; i++) {
     try {
@@ -55,19 +59,21 @@ export async function main() {
 
       console.log("Vault ID:", vault.id);
 
-      const vaultUserCount = vault.accounts.length;
-      console.log("Existing vault depositors count:", vaultUserCount);
+      // const vaultUserCount = vault.accounts.length;
+      // console.log("Existing vault depositors count:", vaultUserCount);
 
-      const numToAdd = getRandomInt(20, 21);
+      const numToAdd = getRandomInt(1, 2);
       console.log("# of depositors to add:", numToAdd);
 
-      const numUsers = vaultUserCount + numToAdd;
+      const numUsers = numToAdd;
+      // const numUsers = vaultUserCount + numToAdd;
       console.log("# to set vault to:", numUsers);
 
       const transactionSentToNetwork = await userFaker.setFakeUsers(
         vault.id,
         numUsers,
-        TOKEN_FAUCET_ADDRESS
+        TOKEN_FAUCET_ADDRESS,
+        { gasLimit: 10000000 }
       );
 
       console.log("TransactionHash:", transactionSentToNetwork.hash);
