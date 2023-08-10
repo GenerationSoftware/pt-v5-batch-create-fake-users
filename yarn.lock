@@ -1343,14 +1343,13 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@generationsoftware/pt-v5-utils-js@^0.0.1-beta.27":
-  version "0.0.1-beta.27"
-  resolved "https://registry.yarnpkg.com/@generationsoftware/pt-v5-utils-js/-/pt-v5-utils-js-0.0.1-beta.27.tgz#a4bb3477413e2b03907d1c2f07bab3b5450c652f"
-  integrity sha512-CiLMmEftgUC0ivZwzFLenyausYiW8ti9+FxjhGlXkLvLKJTi1vJb93x6yip8b6PZeJC3LQksnLXWweBcTsUdKw==
+"@generationsoftware/pt-v5-utils-js@^0.0.1-beta.32":
+  version "0.0.1-beta.32"
+  resolved "https://registry.yarnpkg.com/@generationsoftware/pt-v5-utils-js/-/pt-v5-utils-js-0.0.1-beta.32.tgz#69d7cda147f025e5cd7867fd69ee1a0108eef78a"
+  integrity sha512-xIOEYpCgK4stPPMbpSGYDm3CZuRD4UB03fTSd0jaeiIaVTDv3UNtEpvWnPKMjmSNvSVqtm8epYo+er7NVDAIFg==
   dependencies:
     "@pooltogether/contract-list-schema" "^0.1.4"
     "@types/lodash" "^4.14.195"
-    ethereum-multicall "^2.17.0"
     ethers "^5.5.1"
     ethers-multicall-provider "^3.0.3"
     graphql "^16.6.0"
@@ -3293,7 +3292,7 @@ esutils@^2.0.2:
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.3.tgz#74d2eb4de0b8da1293711910d50775b9b710ef64"
   integrity sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==
 
-ethereum-multicall@^2.16.1, ethereum-multicall@^2.17.0:
+ethereum-multicall@^2.16.1:
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/ethereum-multicall/-/ethereum-multicall-2.17.0.tgz#c56a8884f2d895a87bc90b1257653e2f131ad8a5"
   integrity sha512-9me2vHVjzLbb9Y5xWHCSu0PDtm13SVTZyvV3y2/VAtbuMykoET5g8h/ktL4ECZ8k76cn9jnZythoQki3nJqhSA==

@@ -11,10 +11,11 @@ const CHAIN_ID = 11155111; // sepolia
 const USER_FAKER_ADDRESS = "0xb02BB09C774a1eccA01259F68373894f6eFE7164";
 const TOKEN_FAUCET_ADDRESS = "0xcB0A8a7A1d37e35881461a3971148Dd432746401";
 
+//
 // NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
+//
 const SELECTED_VAULTS = [
-  "0xb634839AC5c7DDCF8523ba7Cc2a9211F4f107423" // usdc
-  // "0x0c393c363bae8eebe6e1afe4716e317cbd2e9949" //  dai
+  "0xb634839ac5c7ddcf8523ba7cc2a9211f4f107423" // usdc
 ];
 
 const getVaults = async (chainId: number) => {
@@ -42,31 +43,31 @@ export async function main() {
   const signer = new ethers.Wallet(privateKey, provider);
 
   const userFaker = new ethers.Contract(USER_FAKER_ADDRESS, userFakerAbi, signer);
-  console.log(userFaker);
 
-  // let vaults: any = await getVaults(CHAIN_ID);
+  let vaults: any = await getVaults(CHAIN_ID);
   // console.log(vaults);
 
-  let vaults = [{ id: "0xb634839AC5c7DDCF8523ba7Cc2a9211F4f107423" }];
+  if (vaults.length === 0) {
+    vaults = [{ id: SELECTED_VAULTS[0], accounts: [] }];
+  }
 
   for (let i = 0; i < vaults.length; i++) {
     try {
-      console.log("");
       const vault = vaults[i];
+
       if (!SELECTED_VAULTS.includes(vault.id)) {
         continue;
       }
 
       console.log("Vault ID:", vault.id);
 
-      // const vaultUserCount = vault.accounts.length;
-      // console.log("Existing vault depositors count:", vaultUserCount);
+      const vaultUserCount = vault.accounts.length;
+      console.log("Existing vault depositors count:", vaultUserCount);
 
-      const numToAdd = getRandomInt(1, 2);
+      const numToAdd = getRandomInt(15, 20);
       console.log("# of depositors to add:", numToAdd);
 
-      const numUsers = numToAdd;
-      // const numUsers = vaultUserCount + numToAdd;
+      const numUsers = vaultUserCount + numToAdd;
       console.log("# to set vault to:", numUsers);
 
       const transactionSentToNetwork = await userFaker.setFakeUsers(
