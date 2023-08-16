@@ -15,7 +15,13 @@ const TOKEN_FAUCET_ADDRESS = "0xcB0A8a7A1d37e35881461a3971148Dd432746401";
 // NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
 //
 const SELECTED_VAULTS = [
+  "0xa036647ec8c956475f8b8fe473ec49f959846fa1", //DAI?
+  // "0xc7e0df4a00f9a99012a828dbd2a26dc8c01e624e", //DAI?
   "0xb634839ac5c7ddcf8523ba7cc2a9211f4f107423" // usdc
+  // "0x2682c2ff5510ff943f2ebfd0a665e3203a9bee4e",
+  // "0xf4236b70bfc155b65a5571a5e4f8961107abfce6",
+  // "0xdc140f0193a9899982c8446c249a94dea147c20b",
+  // "0x80f5984aD748878c9822Af1231dEEF7466Ad85Bf"
 ];
 
 const getVaults = async (chainId: number) => {
@@ -45,10 +51,12 @@ export async function main() {
   const userFaker = new ethers.Contract(USER_FAKER_ADDRESS, userFakerAbi, signer);
 
   let vaults: any = await getVaults(CHAIN_ID);
-  // console.log(vaults);
 
   if (vaults.length === 0) {
-    vaults = [{ id: SELECTED_VAULTS[0], accounts: [] }];
+    vaults = [
+      { id: SELECTED_VAULTS[0], accounts: [] },
+      { id: SELECTED_VAULTS[1], accounts: [] }
+    ];
   }
 
   for (let i = 0; i < vaults.length; i++) {
