@@ -11,14 +11,15 @@ const CHAIN_ID = 420; // opt goerli
 // const CHAIN_ID = 11155111; // sepolia
 
 const USER_FAKER_ADDRESS = "0x7506De196cd50f95c53412844743c90B63fE79ef";
-const TOKEN_FAUCET_ADDRESS = "0xc9f91F4aeee31A2a65eC142b2E6c1725Cd160De5";
+const TOKEN_FAUCET_ADDRESS = "0x4dFbf2A0D807c3282FD27b798e9c1C47E101AFD4";
 
 //
 // NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
 //
 const SELECTED_VAULTS = [
-  "0x3bd1ca87f5d5c80b97d57825151715c204444c94", //DAI?
-  "0xfef4a3fe03a480b1872ff0e95a30f0fa16db323d" // usdc
+  "0x21925199568c8bd5623622ff31d719749f920a8d", //DAI?
+  "0x32c45e4596931ec5900ea4d2703e7cf961ce2ad6", //DAI?
+  "0x61682fba8394970ce014bcde8ae0ec149c29757c" // usdc
 ];
 
 const getVaults = async (chainId: number) => {
@@ -45,7 +46,7 @@ export async function main() {
   const privateKey = process.env.PRIVATE_KEY;
   const signer = new ethers.Wallet(privateKey, provider);
 
-  // const tokenAddress = "0x20524C0a56ec85A1aF9b0989202C5bDc1B649Def"; // POOL
+  const tokenAddress = "0x722701e470b556571A7a3586ADaFa2E866CFD1A1"; // POOL
   // await drip(signer, tokenAddress);
 
   const userFaker = new ethers.Contract(USER_FAKER_ADDRESS, userFakerAbi, signer);
@@ -56,7 +57,8 @@ export async function main() {
   if (vaults.length === 0) {
     vaults = [
       { id: SELECTED_VAULTS[0], accounts: [] },
-      { id: SELECTED_VAULTS[1], accounts: [] }
+      { id: SELECTED_VAULTS[1], accounts: [] },
+      { id: SELECTED_VAULTS[2], accounts: [] }
     ];
   }
 
@@ -74,7 +76,7 @@ export async function main() {
       const vaultUserCount = vault.accounts.length;
       console.log("Existing vault depositors count:", vaultUserCount);
 
-      const numToAdd = getRandomInt(15, 20);
+      const numToAdd = getRandomInt(-7, 20);
       console.log("# of depositors to add:", numToAdd);
 
       const numUsers = vaultUserCount + numToAdd;
@@ -82,7 +84,7 @@ export async function main() {
 
       const transactionSentToNetwork = await userFaker.setFakeUsers(
         vault.id,
-        numUsers,
+        Math.max(numUsers, 1),
         TOKEN_FAUCET_ADDRESS,
         { gasLimit: 10000000 }
       );
@@ -108,7 +110,8 @@ main();
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  const int = Math.floor(Math.random() * (max - min + 1)) + min;
+  return int === 0 ? 1 : int;
 }
 
 // Faucet
