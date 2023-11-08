@@ -7,19 +7,37 @@ import {
 
 import { userFakerAbi } from "./abis/userFakerAbi";
 
-const CHAIN_ID = 420; // opt goerli
-// const CHAIN_ID = 11155111; // sepolia
+export const CHAIN_IDS = {
+  arbitrumSepolia: 421614,
+  sepolia: 11155111,
+  optimismSepolia: 11155420
+};
 
-const USER_FAKER_ADDRESS = "0x7506De196cd50f95c53412844743c90B63fE79ef";
-const TOKEN_FAUCET_ADDRESS = "0x4dFbf2A0D807c3282FD27b798e9c1C47E101AFD4";
+export const USER_FAKER_ADDRESS = {
+  [CHAIN_IDS.arbitrumSepolia]: "",
+  [CHAIN_IDS.optimismSepolia]: ""
+};
 
-//
+export const POOL_TOKEN_ADDRESS = {
+  [CHAIN_IDS.arbitrumSepolia]: "",
+  [CHAIN_IDS.optimismSepolia]: "0xD675B9c8eea7f6Bd506d5FF66A10cF7B887CD293"
+};
+
+export const TOKEN_FAUCET_ADDRESS = {
+  [CHAIN_IDS.arbitrumSepolia]: "",
+  [CHAIN_IDS.optimismSepolia]: "0x553a427f17ce1849b1005d0013825255d54a2122"
+};
+
+const CHAIN_ID = CHAIN_IDS.optimismSepolia;
+
+const provider = new providers.JsonRpcProvider(process.env.OPTIMISM_SEPOLIA_RPC_PROVIDER_URL); // opt sep
+// const provider = new providers.JsonRpcProvider(process.env.ARBITRUM_SEPOLIA_RPC_PROVIDER_URL); // arb sep
+
 // NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
 //
 const SELECTED_VAULTS = [
-  "0x21925199568c8bd5623622ff31d719749f920a8d", //DAI?
-  "0x32c45e4596931ec5900ea4d2703e7cf961ce2ad6", //DAI?
-  "0x61682fba8394970ce014bcde8ae0ec149c29757c" // usdc
+  "0x22c6258ea5b1e742d18c27d846e2aabd4505edc2", // DAI OP SEPOLIA
+  "0x2891d69786650260b9f99a7b333058fcc5418df0" // USDC OP SEPOLIA
 ];
 
 const getVaults = async (chainId: number) => {
@@ -38,27 +56,30 @@ export async function main() {
   console.log("*********** BATCH CREATE FAKE USERS ***********");
   console.log("");
 
-  console.log({ USER_FAKER_ADDRESS });
-  console.log({ TOKEN_FAUCET_ADDRESS });
+  const userFakerAddress = USER_FAKER_ADDRESS[CHAIN_ID];
+  console.log({ userFakerAddress });
+
+  const tokenFaucetAddress = TOKEN_FAUCET_ADDRESS[CHAIN_ID];
+  console.log({ tokenFaucetAddress });
+
+  const poolTokenAddress = POOL_TOKEN_ADDRESS[CHAIN_ID];
+  console.log({ poolTokenAddress });
   console.log("");
 
-  const provider = new providers.JsonRpcProvider(process.env.OPTIMISM_GOERLI_RPC_PROVIDER_URL);
   const privateKey = process.env.PRIVATE_KEY;
   const signer = new ethers.Wallet(privateKey, provider);
 
-  const tokenAddress = "0x722701e470b556571A7a3586ADaFa2E866CFD1A1"; // POOL
-  // await drip(signer, tokenAddress);
+  // await drip(signer, tokenFaucetAddress, poolTokenAddress);
 
-  const userFaker = new ethers.Contract(USER_FAKER_ADDRESS, userFakerAbi, signer);
+  const userFaker = new ethers.Contract(userFakerAddress, userFakerAbi, signer);
 
-  let vaults: any = await getVaults(CHAIN_ID);
-  // let vaults: any = [];
+  // let vaults: any = await getVaults(CHAIN_ID);
+  let vaults: any = [];
 
   if (vaults.length === 0) {
     vaults = [
       { id: SELECTED_VAULTS[0], accounts: [] },
-      { id: SELECTED_VAULTS[1], accounts: [] },
-      { id: SELECTED_VAULTS[2], accounts: [] }
+      { id: SELECTED_VAULTS[1], accounts: [] }
     ];
   }
 
@@ -76,7 +97,7 @@ export async function main() {
       const vaultUserCount = vault.accounts.length;
       console.log("Existing vault depositors count:", vaultUserCount);
 
-      const numToAdd = getRandomInt(-7, 20);
+      const numToAdd = 10;
       console.log("# of depositors to add:", numToAdd);
 
       const numUsers = vaultUserCount + numToAdd;
@@ -115,12 +136,12 @@ function getRandomInt(min, max) {
 }
 
 // Faucet
-async function drip(signer, tokenAddress) {
+async function drip(signer, tokenFaucetAddress, tokenAddress) {
   console.log("drip");
   const contracts = await downloadContractsBlob(CHAIN_ID);
 
   const faucetContractData = contracts.contracts.find(contract => contract.type === "TokenFaucet");
-  const faucetContract = new ethers.Contract(TOKEN_FAUCET_ADDRESS, faucetContractData?.abi, signer);
+  const faucetContract = new ethers.Contract(tokenFaucetAddress, faucetContractData?.abi, signer);
 
   const tx = await faucetContract.drip(tokenAddress);
   console.log("tx");

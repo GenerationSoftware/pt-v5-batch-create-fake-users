@@ -20,7 +20,7 @@
     "url": "https://github.com/pooltogether/v5-autotasks/issues"
   },
   "dependencies": {
-    "@generationsoftware/pt-v5-utils-js": "^0.0.1-beta.47",
+    "@generationsoftware/pt-v5-utils-js": "file:.yalc/@generationsoftware/pt-v5-utils-js",
     "@types/node": "^20.3.0",
     "ethereum-multicall": "^2.16.1",
     "tsdx": "^0.14.1",

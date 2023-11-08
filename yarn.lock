@@ -1343,10 +1343,10 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@generationsoftware/pt-v5-utils-js@^0.0.1-beta.32":
-  version "0.0.1-beta.32"
-  resolved "https://registry.yarnpkg.com/@generationsoftware/pt-v5-utils-js/-/pt-v5-utils-js-0.0.1-beta.32.tgz#69d7cda147f025e5cd7867fd69ee1a0108eef78a"
-  integrity sha512-xIOEYpCgK4stPPMbpSGYDm3CZuRD4UB03fTSd0jaeiIaVTDv3UNtEpvWnPKMjmSNvSVqtm8epYo+er7NVDAIFg==
+"@generationsoftware/pt-v5-utils-js@^0.0.1-beta.51":
+  version "0.0.1-beta.51"
+  resolved "https://registry.yarnpkg.com/@generationsoftware/pt-v5-utils-js/-/pt-v5-utils-js-0.0.1-beta.51.tgz#e9c4a0f73c06e16ec4f8e2e8274e1123932bd194"
+  integrity sha512-+yLBduQ7rTSvhnJyJi2/C7oeJWS0s1mU7i3VrMC8XwKDVGWd1+jZNx2Zl3nhVlSiP3zJY0Ng4H1PAdQ5X1BntA==
   dependencies:
     "@pooltogether/contract-list-schema" "^0.1.4"
     "@types/lodash" "^4.14.195"
