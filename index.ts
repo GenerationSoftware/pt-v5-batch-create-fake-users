@@ -13,32 +13,41 @@ export const CHAIN_IDS = {
   optimismSepolia: 11155420
 };
 
+const SELECTED_CHAIN_ID = CHAIN_IDS.arbitrumSepolia;
+
 export const USER_FAKER_ADDRESS = {
-  [CHAIN_IDS.arbitrumSepolia]: "",
-  [CHAIN_IDS.optimismSepolia]: ""
+  [CHAIN_IDS.arbitrumSepolia]: "0xc086edda021d9b90c09bd0092d47c36879c879fb",
+  [CHAIN_IDS.optimismSepolia]: "0xbcf3095812b97b2e2cd1a1d03230b01dc326c047"
 };
 
 export const POOL_TOKEN_ADDRESS = {
-  [CHAIN_IDS.arbitrumSepolia]: "",
-  [CHAIN_IDS.optimismSepolia]: "0xD675B9c8eea7f6Bd506d5FF66A10cF7B887CD293"
+  [CHAIN_IDS.arbitrumSepolia]: "0xf401d1482dfaa89a050f111992a222e9ad123e14",
+  [CHAIN_IDS.optimismSepolia]: "0xd675b9c8eea7f6bd506d5ff66a10cf7b887cd293"
 };
 
 export const TOKEN_FAUCET_ADDRESS = {
-  [CHAIN_IDS.arbitrumSepolia]: "",
+  [CHAIN_IDS.arbitrumSepolia]: "0xf0b484d8110b2bc5eb82e998e96626560801db42",
   [CHAIN_IDS.optimismSepolia]: "0x553a427f17ce1849b1005d0013825255d54a2122"
 };
 
-const CHAIN_ID = CHAIN_IDS.optimismSepolia;
-
-const provider = new providers.JsonRpcProvider(process.env.OPTIMISM_SEPOLIA_RPC_PROVIDER_URL); // opt sep
-// const provider = new providers.JsonRpcProvider(process.env.ARBITRUM_SEPOLIA_RPC_PROVIDER_URL); // arb sep
+const provider = new providers.JsonRpcProvider(
+  SELECTED_CHAIN_ID === CHAIN_IDS.optimismSepolia
+    ? process.env.OPTIMISM_SEPOLIA_RPC_PROVIDER_URL
+    : process.env.ARBITRUM_SEPOLIA_RPC_PROVIDER_URL
+);
 
 // NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
-//
-const SELECTED_VAULTS = [
-  "0x22c6258ea5b1e742d18c27d846e2aabd4505edc2", // DAI OP SEPOLIA
-  "0x2891d69786650260b9f99a7b333058fcc5418df0" // USDC OP SEPOLIA
-];
+// OP SEPOLIA
+const SELECTED_VAULTS = {
+  [CHAIN_IDS.arbitrumSepolia]: [
+    "0x3adaa1d4f23c82130e1681c2ca9b38f5fb9a0892", // DAI
+    "0xa723cf5d90c1a472c7de7285e5bd314aea107ede" // USDC
+  ],
+  [CHAIN_IDS.optimismSepolia]: [
+    "0x22c6258ea5b1e742d18c27d846e2aabd4505edc2", // DAI
+    "0x2891d69786650260b9f99a7b333058fcc5418df0" // USDC
+  ]
+};
 
 const getVaults = async (chainId: number) => {
   let vaults = await getSubgraphVaults(chainId);
@@ -56,30 +65,30 @@ export async function main() {
   console.log("*********** BATCH CREATE FAKE USERS ***********");
   console.log("");
 
-  const userFakerAddress = USER_FAKER_ADDRESS[CHAIN_ID];
+  const userFakerAddress = USER_FAKER_ADDRESS[SELECTED_CHAIN_ID];
   console.log({ userFakerAddress });
 
-  const tokenFaucetAddress = TOKEN_FAUCET_ADDRESS[CHAIN_ID];
+  const tokenFaucetAddress = TOKEN_FAUCET_ADDRESS[SELECTED_CHAIN_ID];
   console.log({ tokenFaucetAddress });
 
-  const poolTokenAddress = POOL_TOKEN_ADDRESS[CHAIN_ID];
+  const poolTokenAddress = POOL_TOKEN_ADDRESS[SELECTED_CHAIN_ID];
   console.log({ poolTokenAddress });
   console.log("");
 
   const privateKey = process.env.PRIVATE_KEY;
   const signer = new ethers.Wallet(privateKey, provider);
 
-  // await drip(signer, tokenFaucetAddress, poolTokenAddress);
+  await drip(signer, tokenFaucetAddress, poolTokenAddress);
 
   const userFaker = new ethers.Contract(userFakerAddress, userFakerAbi, signer);
 
-  // let vaults: any = await getVaults(CHAIN_ID);
+  // let vaults: any = await getVaults(SELECTED_CHAIN_ID);
   let vaults: any = [];
 
   if (vaults.length === 0) {
     vaults = [
-      { id: SELECTED_VAULTS[0], accounts: [] },
-      { id: SELECTED_VAULTS[1], accounts: [] }
+      { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][0], accounts: [] },
+      { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][1], accounts: [] }
     ];
   }
 
@@ -87,7 +96,7 @@ export async function main() {
     try {
       const vault = vaults[i];
 
-      if (!SELECTED_VAULTS.includes(vault.id)) {
+      if (!SELECTED_VAULTS[SELECTED_CHAIN_ID].includes(vault.id)) {
         console.log("skipping");
         continue;
       }
@@ -97,7 +106,7 @@ export async function main() {
       const vaultUserCount = vault.accounts.length;
       console.log("Existing vault depositors count:", vaultUserCount);
 
-      const numToAdd = 10;
+      const numToAdd = getRandomInt(8, 20);
       console.log("# of depositors to add:", numToAdd);
 
       const numUsers = vaultUserCount + numToAdd;
@@ -106,7 +115,7 @@ export async function main() {
       const transactionSentToNetwork = await userFaker.setFakeUsers(
         vault.id,
         Math.max(numUsers, 1),
-        TOKEN_FAUCET_ADDRESS,
+        tokenFaucetAddress,
         { gasLimit: 10000000 }
       );
       await transactionSentToNetwork.wait();
@@ -138,7 +147,7 @@ function getRandomInt(min, max) {
 // Faucet
 async function drip(signer, tokenFaucetAddress, tokenAddress) {
   console.log("drip");
-  const contracts = await downloadContractsBlob(CHAIN_ID);
+  const contracts = await downloadContractsBlob(SELECTED_CHAIN_ID);
 
   const faucetContractData = contracts.contracts.find(contract => contract.type === "TokenFaucet");
   const faucetContract = new ethers.Contract(tokenFaucetAddress, faucetContractData?.abi, signer);
