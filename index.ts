@@ -13,7 +13,7 @@ export const CHAIN_IDS = {
   optimismSepolia: 11155420
 };
 
-const SELECTED_CHAIN_ID = CHAIN_IDS.arbitrumSepolia;
+const SELECTED_CHAIN_ID = CHAIN_IDS.optimismSepolia;
 
 export const USER_FAKER_ADDRESS = {
   [CHAIN_IDS.arbitrumSepolia]: "0xc086edda021d9b90c09bd0092d47c36879c879fb",
@@ -36,12 +36,14 @@ const provider = new providers.JsonRpcProvider(
     : process.env.ARBITRUM_SEPOLIA_RPC_PROVIDER_URL
 );
 
+// !!!
 // NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
-// OP SEPOLIA
+// !!!
 const SELECTED_VAULTS = {
   [CHAIN_IDS.arbitrumSepolia]: [
-    "0x3adaa1d4f23c82130e1681c2ca9b38f5fb9a0892", // DAI
-    "0xa723cf5d90c1a472c7de7285e5bd314aea107ede" // USDC
+    // "0x3adaa1d4f23c82130e1681c2ca9b38f5fb9a0892", // DAI
+    // "0xa723cf5d90c1a472c7de7285e5bd314aea107ede" // USDC
+    "0xa5905161eab67b6a13104537a09a949ef043366e" // V2 Vault WETH
   ],
   [CHAIN_IDS.optimismSepolia]: [
     "0x22c6258ea5b1e742d18c27d846e2aabd4505edc2", // DAI
@@ -78,28 +80,29 @@ export async function main() {
   const privateKey = process.env.PRIVATE_KEY;
   const signer = new ethers.Wallet(privateKey, provider);
 
-  await drip(signer, tokenFaucetAddress, poolTokenAddress);
+  // await drip(signer, tokenFaucetAddress, poolTokenAddress);
 
   const userFaker = new ethers.Contract(userFakerAddress, userFakerAbi, signer);
 
-  // let vaults: any = await getVaults(SELECTED_CHAIN_ID);
-  let vaults: any = [];
+  let vaults: any = await getVaults(SELECTED_CHAIN_ID);
+  // let vaults: any = [];
 
-  if (vaults.length === 0) {
-    vaults = [
-      { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][0], accounts: [] },
-      { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][1], accounts: [] }
-    ];
-  }
+  // if (vaults.length === 0) {
+  //   vaults = [
+  //     { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][0], accounts: [] },
+  //     { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][1], accounts: [] }
+  //   ];
+  // }
+  console.log(vaults);
 
   for (let i = 0; i < vaults.length; i++) {
     try {
       const vault = vaults[i];
 
-      if (!SELECTED_VAULTS[SELECTED_CHAIN_ID].includes(vault.id)) {
-        console.log("skipping");
-        continue;
-      }
+      // if (!SELECTED_VAULTS[SELECTED_CHAIN_ID].includes(vault.id)) {
+      //   console.log("skipping");
+      //   continue;
+      // }
 
       console.log("Vault ID:", vault.id);
 
