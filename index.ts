@@ -22,12 +22,12 @@ export const USER_FAKER_ADDRESS = {
 
 export const POOL_TOKEN_ADDRESS = {
   [CHAIN_IDS.arbitrumSepolia]: "0xf401d1482dfaa89a050f111992a222e9ad123e14",
-  [CHAIN_IDS.optimismSepolia]: "0xd675b9c8eea7f6bd506d5ff66a10cf7b887cd293"
+  [CHAIN_IDS.optimismSepolia]: "0xa6bff884a85306cd1ab61dc010e3dca94f39cbec"
 };
 
 export const TOKEN_FAUCET_ADDRESS = {
   [CHAIN_IDS.arbitrumSepolia]: "0xf0b484d8110b2bc5eb82e998e96626560801db42",
-  [CHAIN_IDS.optimismSepolia]: "0x553a427f17ce1849b1005d0013825255d54a2122"
+  [CHAIN_IDS.optimismSepolia]: "0x8cfffffa42407db9dcb974c2c744425c3e58d832"
 };
 
 const provider = new providers.JsonRpcProvider(
@@ -46,8 +46,8 @@ const SELECTED_VAULTS = {
     "0xa5905161eab67b6a13104537a09a949ef043366e" // V2 Vault WETH
   ],
   [CHAIN_IDS.optimismSepolia]: [
-    "0x22c6258ea5b1e742d18c27d846e2aabd4505edc2", // DAI
-    "0x2891d69786650260b9f99a7b333058fcc5418df0" // USDC
+    "0x0fa95bdc0d8c6e39be9bf0f003ab4fa2d8d7a2ab", // DAI
+    "0xb7b84e913adfb1d92128a261c11ec6dbd1f2bb9c" // USDC
   ]
 };
 
@@ -84,15 +84,15 @@ export async function main() {
 
   const userFaker = new ethers.Contract(userFakerAddress, userFakerAbi, signer);
 
-  let vaults: any = await getVaults(SELECTED_CHAIN_ID);
-  // let vaults: any = [];
+  // let vaults: any = await getVaults(SELECTED_CHAIN_ID);
+  let vaults: any = [];
 
-  // if (vaults.length === 0) {
-  //   vaults = [
-  //     { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][0], accounts: [] },
-  //     { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][1], accounts: [] }
-  //   ];
-  // }
+  if (vaults.length === 0) {
+    vaults = [
+      { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][0], accounts: [] },
+      { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][1], accounts: [] }
+    ];
+  }
   console.log(vaults);
 
   for (let i = 0; i < vaults.length; i++) {
@@ -121,9 +121,9 @@ export async function main() {
         tokenFaucetAddress,
         { gasLimit: 10000000 }
       );
+      console.log("TransactionHash:", transactionSentToNetwork.hash);
       await transactionSentToNetwork.wait();
 
-      console.log("TransactionHash:", transactionSentToNetwork.hash);
       console.log("");
     } catch (error) {
       throw new Error(error);
