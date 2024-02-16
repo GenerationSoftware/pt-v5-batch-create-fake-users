@@ -14,7 +14,7 @@
   "type": "module",
   "scripts": {
     "start": "ts-node --esm --experimental-specifier-resolution=node ./index.ts",
-    "yalcadd": "npx yalc add @pooltogether/v5-utils-js --pure"
+    "yalcadd": "npx yalc add @generationsoftware/pt-v5-utils-js --pure"
   },
   "bugs": {
     "url": "https://github.com/pooltogether/v5-autotasks/issues"

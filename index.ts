@@ -1,8 +1,9 @@
 import { ethers, providers } from "ethers";
 import {
-  downloadContractsBlob
-  // getSubgraphVaults,
-  // populateSubgraphVaultAccounts
+  downloadContractsBlob,
+  getSubgraphPrizeVaults,
+  populateSubgraphPrizeVaultAccounts,
+  ContractVersion
 } from "@generationsoftware/pt-v5-utils-js";
 
 import { userFakerAbi } from "./abis/userFakerAbi";
@@ -36,6 +37,8 @@ const provider = new providers.JsonRpcProvider(
     : process.env.ARBITRUM_SEPOLIA_RPC_PROVIDER_URL
 );
 
+const CONTRACT_VERSION: ContractVersion = "v51";
+
 // !!!
 // NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
 // !!!
@@ -51,17 +54,17 @@ const SELECTED_VAULTS = {
   ]
 };
 
-// const getVaults = async (chainId: number) => {
-//   let vaults = await getSubgraphVaults(chainId);
-//   if (vaults.length === 0) {
-//     throw new Error("Claimer: No vaults found in subgraph");
-//   }
+const getPrizeVaults = async (chainId: number) => {
+  let prizeVaults = await getSubgraphPrizeVaults(chainId, CONTRACT_VERSION);
+  if (prizeVaults.length === 0) {
+    throw new Error("Claimer: No prizeVaults found in subgraph");
+  }
 
-//   // Page through and concat all accounts for all vaults
-//   vaults = await populateSubgraphVaultAccounts(chainId, vaults);
+  // Page through and concat all accounts for all prizeVaults
+  prizeVaults = await populateSubgraphPrizeVaultAccounts(chainId, CONTRACT_VERSION, prizeVaults);
 
-//   return vaults;
-// };
+  return prizeVaults;
+};
 
 export async function main() {
   console.log("*********** BATCH CREATE FAKE USERS ***********");
@@ -84,20 +87,19 @@ export async function main() {
 
   const userFaker = new ethers.Contract(userFakerAddress, userFakerAbi, signer);
 
-  // let vaults: any = await getVaults(SELECTED_CHAIN_ID);
-  let vaults: any = [];
+  let prizeVaults: any = await getPrizeVaults(SELECTED_CHAIN_ID);
+  // let prizeVaults: any = [];
 
-  if (vaults.length === 0) {
-    vaults = [
+  if (prizeVaults.length === 0) {
+    prizeVaults = [
       { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][0], accounts: [] },
       { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][1], accounts: [] }
     ];
   }
-  console.log(vaults);
 
-  for (let i = 0; i < vaults.length; i++) {
+  for (let i = 0; i < prizeVaults.length; i++) {
     try {
-      const vault = vaults[i];
+      const vault = prizeVaults[i];
 
       // if (!SELECTED_VAULTS[SELECTED_CHAIN_ID].includes(vault.id)) {
       //   console.log("skipping");
@@ -150,7 +152,7 @@ function getRandomInt(min, max) {
 // Faucet
 async function drip(signer, tokenFaucetAddress, tokenAddress) {
   console.log("drip");
-  const contracts = await downloadContractsBlob(SELECTED_CHAIN_ID);
+  const contracts = await downloadContractsBlob(SELECTED_CHAIN_ID, CONTRACT_VERSION);
 
   const faucetContractData = contracts.contracts.find(contract => contract.type === "TokenFaucet");
   const faucetContract = new ethers.Contract(tokenFaucetAddress, faucetContractData?.abi, signer);
