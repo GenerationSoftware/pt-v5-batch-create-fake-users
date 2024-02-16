@@ -1,8 +1,8 @@
 import { ethers, providers } from "ethers";
 import {
-  downloadContractsBlob,
-  getSubgraphVaults,
-  populateSubgraphVaultAccounts
+  downloadContractsBlob
+  // getSubgraphVaults,
+  // populateSubgraphVaultAccounts
 } from "@generationsoftware/pt-v5-utils-js";
 
 import { userFakerAbi } from "./abis/userFakerAbi";
@@ -22,12 +22,12 @@ export const USER_FAKER_ADDRESS = {
 
 export const POOL_TOKEN_ADDRESS = {
   [CHAIN_IDS.arbitrumSepolia]: "0xf401d1482dfaa89a050f111992a222e9ad123e14",
-  [CHAIN_IDS.optimismSepolia]: "0xa6bff884a85306cd1ab61dc010e3dca94f39cbec"
+  [CHAIN_IDS.optimismSepolia]: "0x7396655c4ac7d32aa458d837b2749cd4db762564"
 };
 
 export const TOKEN_FAUCET_ADDRESS = {
   [CHAIN_IDS.arbitrumSepolia]: "0xf0b484d8110b2bc5eb82e998e96626560801db42",
-  [CHAIN_IDS.optimismSepolia]: "0x8cfffffa42407db9dcb974c2c744425c3e58d832"
+  [CHAIN_IDS.optimismSepolia]: "0x6059cc0d895fd913811508d474192f6ff564dcf6"
 };
 
 const provider = new providers.JsonRpcProvider(
@@ -46,22 +46,22 @@ const SELECTED_VAULTS = {
     "0xa5905161eab67b6a13104537a09a949ef043366e" // V2 Vault WETH
   ],
   [CHAIN_IDS.optimismSepolia]: [
-    "0x0fa95bdc0d8c6e39be9bf0f003ab4fa2d8d7a2ab", // DAI
-    "0xb7b84e913adfb1d92128a261c11ec6dbd1f2bb9c" // USDC
+    "0x0ffe33d8b2d93ff1eff4be866c87ae45c22fb681", // DAI
+    "0x170de99261a497d5b29aa2279cc2f3da0eb09b4b" // USDC
   ]
 };
 
-const getVaults = async (chainId: number) => {
-  let vaults = await getSubgraphVaults(chainId);
-  if (vaults.length === 0) {
-    throw new Error("Claimer: No vaults found in subgraph");
-  }
+// const getVaults = async (chainId: number) => {
+//   let vaults = await getSubgraphVaults(chainId);
+//   if (vaults.length === 0) {
+//     throw new Error("Claimer: No vaults found in subgraph");
+//   }
 
-  // Page through and concat all accounts for all vaults
-  vaults = await populateSubgraphVaultAccounts(chainId, vaults);
+//   // Page through and concat all accounts for all vaults
+//   vaults = await populateSubgraphVaultAccounts(chainId, vaults);
 
-  return vaults;
-};
+//   return vaults;
+// };
 
 export async function main() {
   console.log("*********** BATCH CREATE FAKE USERS ***********");
@@ -109,7 +109,7 @@ export async function main() {
       const vaultUserCount = vault.accounts.length;
       console.log("Existing vault depositors count:", vaultUserCount);
 
-      const numToAdd = getRandomInt(8, 20);
+      const numToAdd = getRandomInt(0, 20);
       console.log("# of depositors to add:", numToAdd);
 
       const numUsers = vaultUserCount + numToAdd;
