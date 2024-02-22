@@ -25,13 +25,13 @@ export const USER_FAKER_ADDRESS = {
 export const POOL_TOKEN_ADDRESS = {
   [CHAIN_IDS.arbitrumSepolia]: "0xf401d1482dfaa89a050f111992a222e9ad123e14",
   [CHAIN_IDS.optimismSepolia]: "0x7396655c4ac7d32aa458d837b2749cd4db762564",
-  [CHAIN_IDS.optimismGoerli]: "0xde142f273ed15546f9c61fa1ad23c0bfbc6aa26e"
+  [CHAIN_IDS.optimismGoerli]: "0xbb0c41504bdcfbb73a70351ae764f010f2174585"
 };
 
 export const TOKEN_FAUCET_ADDRESS = {
   [CHAIN_IDS.arbitrumSepolia]: "0xf0b484d8110b2bc5eb82e998e96626560801db42",
   [CHAIN_IDS.optimismSepolia]: "0x6059cc0d895fd913811508d474192f6ff564dcf6",
-  [CHAIN_IDS.optimismGoerli]: "0x3e4c05b244b95910cf8f17c51060797f2eecb3f7"
+  [CHAIN_IDS.optimismGoerli]: "0xe2978b475a575b55c4c7756f6746d6c9f003c42d"
 };
 
 const provider = new providers.JsonRpcProvider(
@@ -56,8 +56,8 @@ const SELECTED_VAULTS = {
     "0x170de99261a497d5b29aa2279cc2f3da0eb09b4b" // USDC
   ],
   [CHAIN_IDS.optimismGoerli]: [
-    "0x9407700d80fd43b8e9741d0202786fd09e553fdd", // DAI
-    "0x596845f8608d40c79d7608b72adf79e99e6b7422" // USDC
+    "0xc1167f220939fdc548eb13999e2f3106f35d2875", // DAI
+    "0xc112371004be0a1d6f9094cd2339ae06b8bd93c4" // USDC
   ]
 };
 
@@ -90,19 +90,19 @@ export async function main() {
   const privateKey = process.env.PRIVATE_KEY;
   const signer = new ethers.Wallet(privateKey, provider);
 
-  // await drip(signer, tokenFaucetAddress, poolTokenAddress);
+  await drip(signer, tokenFaucetAddress, poolTokenAddress);
 
   const userFaker = new ethers.Contract(userFakerAddress, userFakerAbi, signer);
 
   let prizeVaults: any = await getPrizeVaults(SELECTED_CHAIN_ID);
   // let prizeVaults: any = [];
 
-  if (prizeVaults.length === 0) {
-    prizeVaults = [
-      { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][0], accounts: [] },
-      { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][1], accounts: [] }
-    ];
-  }
+  // if (prizeVaults.length === 0) {
+  //   prizeVaults = [
+  //     { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][0], accounts: [] },
+  //     { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][1], accounts: [] }
+  //   ];
+  // }
 
   for (let i = 0; i < prizeVaults.length; i++) {
     try {
