@@ -1,3 +1,4 @@
+import axios, { isCancel, AxiosError } from "axios";
 import chalk from "chalk";
 import nodeFetch from "node-fetch";
 import { ethers, providers } from "ethers";
@@ -13,14 +14,16 @@ import { ERC20Abi } from "./abis/ERC20Abi";
 
 const CHAIN_IDS = {
   sepolia: 11155111,
-  optimismSepolia: 11155420
+  optimismSepolia: 11155420,
+  optimismGoerli: 420
 };
 
-const CHAIN_NAME = "optimismSepolia";
+const CHAIN_NAME = "optimismGoerli";
 const SELECTED_CHAIN_ID = CHAIN_IDS[CHAIN_NAME];
 
 const USER_FAKER_ADDRESS = {
   [CHAIN_IDS.sepolia]: "0xb02bb09c774a1ecca01259f68373894f6efe7164",
+  [CHAIN_IDS.optimismGoerli]: "0x7506De196cd50f95c53412844743c90B63fE79ef",
   [CHAIN_IDS.optimismSepolia]: "0xbcf3095812b97b2e2cd1a1d03230b01dc326c047"
 };
 
@@ -30,6 +33,10 @@ const getProviderUrl = (): string | undefined => {
   switch (SELECTED_CHAIN_ID) {
     case CHAIN_IDS.sepolia: {
       url = process.env.SEPOLIA_RPC_PROVIDER_URL;
+      break;
+    }
+    case CHAIN_IDS.optimismGoerli: {
+      url = process.env.OPTIMISM_GOERLI_RPC_PROVIDER_URL;
       break;
     }
     case CHAIN_IDS.optimismSepolia: {
@@ -49,14 +56,19 @@ const getProviderUrl = (): string | undefined => {
 };
 
 const getSelectedPrizeVaults = async () => {
+  const url = `https://raw.githubusercontent.com/GenerationSoftware/pt-v5-testnet/v51/deployments/${CHAIN_NAME}/vaults.json`;
   try {
-    const response = await nodeFetch(
-      `https://raw.githubusercontent.com/GenerationSoftware/pt-v5-testnet/v51/deployments/${CHAIN_NAME}/vaults.json`
-    );
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-    return await response.json();
+    console.log(url);
+    // const response = await nodeFetch(
+    //   url
+    // );
+    const response = await axios.get(url);
+    console.log(response);
+
+    // if (!response.ok) {
+    //   throw new Error(response.statusText);
+    // }
+    // return await response.json();
   } catch (err) {
     console.error(chalk.red(err));
   }
@@ -119,7 +131,10 @@ export async function main() {
   );
   console.log("");
 
-  console.log(getSelectedPrizeVaults());
+  console.log("test");
+
+  console.log(await getSelectedPrizeVaults());
+  console.log("here");
 
   const provider = new providers.JsonRpcProvider(getProviderUrl());
 
