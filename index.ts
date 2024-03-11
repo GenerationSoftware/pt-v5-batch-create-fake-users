@@ -1,6 +1,4 @@
-import axios, { isCancel, AxiosError } from "axios";
 import chalk from "chalk";
-import nodeFetch from "node-fetch";
 import { ethers, providers } from "ethers";
 import {
   ContractsBlob,

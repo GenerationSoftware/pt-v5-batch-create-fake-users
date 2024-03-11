@@ -22,10 +22,8 @@
   "dependencies": {
     "@generationsoftware/pt-v5-utils-js": "file:.yalc/@generationsoftware/pt-v5-utils-js",
     "@types/node": "^20.3.0",
-    "axios": "^1.6.7",
     "chalk": "^5.3.0",
     "ethereum-multicall": "^2.16.1",
-    "node-fetch": "^3.3.2",
     "tsdx": "^0.14.1",
     "typescript": "^5.1.3"
   },
