@@ -55,25 +55,6 @@ const getProviderUrl = (): string | undefined => {
   return url;
 };
 
-const getSelectedPrizeVaults = async () => {
-  const url = `https://raw.githubusercontent.com/GenerationSoftware/pt-v5-testnet/v51/deployments/${CHAIN_NAME}/vaults.json`;
-  try {
-    console.log(url);
-    // const response = await nodeFetch(
-    //   url
-    // );
-    const response = await axios.get(url);
-    console.log(response);
-
-    // if (!response.ok) {
-    //   throw new Error(response.statusText);
-    // }
-    // return await response.json();
-  } catch (err) {
-    console.error(chalk.red(err));
-  }
-};
-
 // !!!
 // NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
 // !!!
@@ -131,11 +112,6 @@ export async function main() {
   );
   console.log("");
 
-  console.log("test");
-
-  console.log(await getSelectedPrizeVaults());
-  console.log("here");
-
   const provider = new providers.JsonRpcProvider(getProviderUrl());
 
   const contracts: ContractsBlob = await getContracts();
@@ -143,12 +119,17 @@ export async function main() {
   const erc20MintableContracts = contracts.contracts.filter(
     contract => contract.type === "ERC20Mintable"
   );
+  const prizeVaultContracts = contracts.contracts.filter(
+    contract => contract.type === "PrizeVault"
+  );
 
   const addresses = {
     userFakerAddress: USER_FAKER_ADDRESS[SELECTED_CHAIN_ID],
     tokenFaucetAddress: faucetContractData?.address,
     poolTokenAddress: erc20MintableContracts[5].address,
-    wethTokenAddress: erc20MintableContracts[4].address
+    wethTokenAddress: erc20MintableContracts[4].address,
+    daiVaultAddress: prizeVaultContracts[0].address,
+    usdcVaultAddress: prizeVaultContracts[2].address
   };
 
   console.table(addresses);
@@ -162,13 +143,13 @@ export async function main() {
 
   const userFaker = new ethers.Contract(addresses.userFakerAddress, userFakerAbi, signer);
 
-  let prizeVaults: any = await getPrizeVaults(SELECTED_CHAIN_ID);
-  // let prizeVaults: any = [];
+  // let prizeVaults: any = await getPrizeVaults(SELECTED_CHAIN_ID);
+  let prizeVaults: any = [];
 
   if (prizeVaults.length === 0) {
     prizeVaults = [
-      { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][0], accounts: [] },
-      { id: SELECTED_VAULTS[SELECTED_CHAIN_ID][1], accounts: [] }
+      { id: addresses.daiVaultAddress, accounts: [] },
+      { id: addresses.usdcVaultAddress, accounts: [] }
     ];
   }
 
