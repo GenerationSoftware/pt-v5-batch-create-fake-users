@@ -102,12 +102,12 @@ export async function main() {
   );
 
   const addresses = {
-    userFakerAddress: USER_FAKER_ADDRESS[SELECTED_CHAIN_ID],
-    tokenFaucetAddress: faucetContractData?.address,
-    poolTokenAddress: erc20MintableContracts[5].address,
-    wethTokenAddress: erc20MintableContracts[4].address,
-    daiVaultAddress: prizeVaultContracts[0].address,
-    usdcVaultAddress: prizeVaultContracts[2].address
+    userFakerAddress: USER_FAKER_ADDRESS[SELECTED_CHAIN_ID].toLowerCase(),
+    tokenFaucetAddress: faucetContractData?.address.toLowerCase(),
+    poolTokenAddress: erc20MintableContracts[5].address.toLowerCase(),
+    wethTokenAddress: erc20MintableContracts[4].address.toLowerCase(),
+    daiVaultAddress: prizeVaultContracts[0].address.toLowerCase(),
+    usdcVaultAddress: prizeVaultContracts[2].address.toLowerCase()
   };
 
   console.table(addresses);
@@ -121,8 +121,8 @@ export async function main() {
 
   const userFaker = new ethers.Contract(addresses.userFakerAddress, userFakerAbi, signer);
 
-  // let prizeVaults: any = await getPrizeVaults(SELECTED_CHAIN_ID);
-  let prizeVaults: any = [];
+  let prizeVaults: any = await getPrizeVaults(SELECTED_CHAIN_ID);
+  // let prizeVaults: any = [];
 
   if (prizeVaults.length === 0) {
     prizeVaults = [
