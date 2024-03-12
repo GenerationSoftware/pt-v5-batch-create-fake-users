@@ -12,16 +12,14 @@ import { ERC20Abi } from "./abis/ERC20Abi";
 
 const CHAIN_IDS = {
   sepolia: 11155111,
-  optimismSepolia: 11155420,
-  optimismGoerli: 420
+  optimismSepolia: 11155420
 };
 
-const CHAIN_NAME = "optimismGoerli";
+const CHAIN_NAME = "optimismSepolia";
 const SELECTED_CHAIN_ID = CHAIN_IDS[CHAIN_NAME];
 
 const USER_FAKER_ADDRESS = {
   [CHAIN_IDS.sepolia]: "0xb02bb09c774a1ecca01259f68373894f6efe7164",
-  [CHAIN_IDS.optimismGoerli]: "0x7506De196cd50f95c53412844743c90B63fE79ef",
   [CHAIN_IDS.optimismSepolia]: "0xbcf3095812b97b2e2cd1a1d03230b01dc326c047"
 };
 
@@ -31,10 +29,6 @@ const getProviderUrl = (): string | undefined => {
   switch (SELECTED_CHAIN_ID) {
     case CHAIN_IDS.sepolia: {
       url = process.env.SEPOLIA_RPC_PROVIDER_URL;
-      break;
-    }
-    case CHAIN_IDS.optimismGoerli: {
-      url = process.env.OPTIMISM_GOERLI_RPC_PROVIDER_URL;
       break;
     }
     case CHAIN_IDS.optimismSepolia: {
@@ -51,20 +45,6 @@ const getProviderUrl = (): string | undefined => {
   }
 
   return url;
-};
-
-// !!!
-// NOTE: Make sure to lowercase these addresses so they play nice with the subgraph:
-// !!!
-const SELECTED_VAULTS = {
-  [CHAIN_IDS.sepolia]: [
-    "0x7de52acb8cebc9713a804f5fdbd443e95234a31a", // DAI
-    "0x8d8d5e80daec5c917d1b1e7a331dae2fa0a789f5" // USDC
-  ],
-  [CHAIN_IDS.optimismSepolia]: [
-    "0x0ffe33d8b2d93ff1eff4be866c87ae45c22fb681", // DAI
-    "0x170de99261a497d5b29aa2279cc2f3da0eb09b4b" // USDC
-  ]
 };
 
 const getPrizeVaults = async (chainId: number) => {
@@ -155,7 +135,7 @@ export async function main() {
     try {
       const vault = prizeVaults[i];
 
-      if (!SELECTED_VAULTS[SELECTED_CHAIN_ID].includes(vault.id)) {
+      if (addresses.usdcVaultAddress !== vault.id && addresses.daiVaultAddress !== vault.id) {
         console.log("skipping");
         continue;
       }
