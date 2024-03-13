@@ -1,6 +1,8 @@
+import yn from "yn";
 import chalk from "chalk";
 import { ethers, providers } from "ethers";
 import {
+  PrizeVault,
   ContractsBlob,
   downloadContractsBlob,
   getSubgraphPrizeVaults,
@@ -14,9 +16,15 @@ const CHAIN_IDS = {
   sepolia: 11155111,
   optimismSepolia: 11155420
 };
+const CHAIN_NAMES = {
+  11155111: "sepolia",
+  11155420: "optimismSepolia"
+};
 
-const CHAIN_NAME = "optimismSepolia";
-const SELECTED_CHAIN_ID = CHAIN_IDS[CHAIN_NAME];
+const selectedChainId = Number(process.argv[2]);
+const chainName = CHAIN_NAMES[selectedChainId];
+const onlyDrip = yn(process.argv[3]);
+const useSubgraph = yn(process.argv[4]);
 
 const USER_FAKER_ADDRESS = {
   [CHAIN_IDS.sepolia]: "0xb02bb09c774a1ecca01259f68373894f6efe7164",
@@ -26,7 +34,7 @@ const USER_FAKER_ADDRESS = {
 const getProviderUrl = (): string | undefined => {
   let url: string | undefined = "";
 
-  switch (SELECTED_CHAIN_ID) {
+  switch (selectedChainId) {
     case CHAIN_IDS.sepolia: {
       url = process.env.SEPOLIA_RPC_PROVIDER_URL;
       break;
@@ -39,7 +47,10 @@ const getProviderUrl = (): string | undefined => {
 
   if (!url) {
     console.error(
-      chalk.red("[FATAL] Could not find provider URL for chain with name: ", CHAIN_NAME)
+      chalk.red(
+        "[FATAL] Could not find provider URL for chain with name: ",
+        toCapitalizedWords(chainName)
+      )
     );
     console.log("");
   }
@@ -61,7 +72,7 @@ const getPrizeVaults = async (chainId: number) => {
 
 const getContracts = async () => {
   try {
-    const contracts: ContractsBlob = await downloadContractsBlob(SELECTED_CHAIN_ID);
+    const contracts: ContractsBlob = await downloadContractsBlob(selectedChainId);
     return contracts;
   } catch (error) {
     throw new Error(error);
@@ -84,9 +95,7 @@ export async function main() {
 
   console.log("");
   console.log(
-    chalk.cyan(
-      `Operating on chain with ID #${SELECTED_CHAIN_ID} - ${toCapitalizedWords(CHAIN_NAME)}`
-    )
+    chalk.cyan(`Operating on chain with ID #${selectedChainId} - ${toCapitalizedWords(chainName)}`)
   );
   console.log("");
 
@@ -102,7 +111,7 @@ export async function main() {
   );
 
   const addresses = {
-    userFakerAddress: USER_FAKER_ADDRESS[SELECTED_CHAIN_ID].toLowerCase(),
+    userFakerAddress: USER_FAKER_ADDRESS[selectedChainId].toLowerCase(),
     tokenFaucetAddress: faucetContractData?.address.toLowerCase(),
     poolTokenAddress: erc20MintableContracts[5].address.toLowerCase(),
     wethTokenAddress: erc20MintableContracts[4].address.toLowerCase(),
@@ -116,13 +125,18 @@ export async function main() {
   const privateKey = process.env.PRIVATE_KEY;
   const signer = new ethers.Wallet(privateKey, provider);
 
-  await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.wethTokenAddress);
-  await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.poolTokenAddress);
+  if (onlyDrip) {
+    await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.wethTokenAddress);
+    await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.poolTokenAddress);
+    return;
+  }
 
   const userFaker = new ethers.Contract(addresses.userFakerAddress, userFakerAbi, signer);
 
-  let prizeVaults: any = await getPrizeVaults(SELECTED_CHAIN_ID);
-  // let prizeVaults: any = [];
+  let prizeVaults: PrizeVault[] = [];
+  if (useSubgraph) {
+    prizeVaults = await getPrizeVaults(selectedChainId);
+  }
 
   if (prizeVaults.length === 0) {
     prizeVaults = [
