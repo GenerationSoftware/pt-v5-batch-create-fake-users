@@ -13,22 +13,26 @@
   "main": "./index",
   "type": "module",
   "scripts": {
-    "start": "ts-node --esm --experimental-specifier-resolution=node ./index.ts",
-    "create-fake:with-subgraph:optimism-sepolia": "ts-node --esm --experimental-specifier-resolution=node ./index.ts 11155420 false true",
-    "create-fake:no-subgraph:optimism-sepolia": "ts-node --esm --experimental-specifier-resolution=node ./index.ts 11155420 false false",
-    "drip:optimism-sepolia": "ts-node --esm --experimental-specifier-resolution=node ./index.ts 11155420 true",
+    "create-fake:with-subgraph:optimism-sepolia": "tsx ./index.ts 11155420 false true",
+    "create-fake:no-subgraph:optimism-sepolia": "tsx ./index.ts 11155420 false false",
+    "drip:optimism-sepolia": "tsx ./index.ts 11155420 true",
     "yalcadd": "npx yalc add @generationsoftware/pt-v5-utils-js --pure"
   },
   "bugs": {
     "url": "https://github.com/pooltogether/v5-autotasks/issues"
   },
   "dependencies": {
-    "@generationsoftware/pt-v5-utils-js": "file:.yalc/@generationsoftware/pt-v5-utils-js",
+    "@ethersproject/abi": "5.7.0",
+    "@ethersproject/providers": "5.7.2",
+    "@generationsoftware/pt-v5-utils-js": "1.1.0-beta.4",
     "@types/node": "^20.3.0",
     "chalk": "^5.3.0",
     "ethers": "^5.5.1",
     "ethers-multicall-provider": "3.1.2",
+    "lodash": "^4.17.21",
+    "lodash.pickby": "^4.6.0",
     "tsdx": "^0.14.1",
+    "tsx": "^4.7.1",
     "typescript": "^5.1.3",
     "yn": "^5.0.0"
   },
