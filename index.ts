@@ -66,12 +66,12 @@ const getPrizeVaults = async (chainId: number, prizePoolInfo: PrizePoolInfo) => 
     throw new Error("Claimer: No prizeVaults found in subgraph");
   }
 
-  // Page through and concat all accounts with recent non-zero balance (based on
-  // last draw closed at timestamp) for all prizeVaults
+  // Page through and concat all accounts with recent non-zero balance
+  // (based on current time) for all prizeVaults
   prizeVaults = await populateSubgraphPrizeVaultAccounts(
     chainId,
     prizeVaults,
-    prizePoolInfo.lastDrawClosedAt
+    Math.floor(Date.now() / 1000)
   );
 
   return prizeVaults;
@@ -182,7 +182,7 @@ export async function main() {
         vault.id,
         Math.max(numUsers, 1),
         addresses.tokenFaucetAddress,
-        { gasLimit: 10000000 }
+        { gasLimit: 20000000 }
       );
       console.log("TransactionHash:", transactionSentToNetwork.hash);
       await transactionSentToNetwork.wait();
