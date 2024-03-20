@@ -2,9 +2,11 @@ import yn from "yn";
 import chalk from "chalk";
 import { ethers, providers } from "ethers";
 import {
+  PrizePoolInfo,
   PrizeVault,
   ContractsBlob,
   downloadContractsBlob,
+  getPrizePoolInfo,
   getSubgraphPrizeVaults,
   populateSubgraphPrizeVaultAccounts
 } from "@generationsoftware/pt-v5-utils-js";
@@ -58,14 +60,19 @@ const getProviderUrl = (): string | undefined => {
   return url;
 };
 
-const getPrizeVaults = async (chainId: number) => {
+const getPrizeVaults = async (chainId: number, prizePoolInfo: PrizePoolInfo) => {
   let prizeVaults = await getSubgraphPrizeVaults(chainId);
   if (prizeVaults.length === 0) {
     throw new Error("Claimer: No prizeVaults found in subgraph");
   }
 
-  // Page through and concat all accounts for all prizeVaults
-  prizeVaults = await populateSubgraphPrizeVaultAccounts(chainId, prizeVaults);
+  // Page through and concat all accounts with recent non-zero balance (based on
+  // last draw closed at timestamp) for all prizeVaults
+  prizeVaults = await populateSubgraphPrizeVaultAccounts(
+    chainId,
+    prizeVaults,
+    prizePoolInfo.lastDrawClosedAt
+  );
 
   return prizeVaults;
 };
@@ -136,7 +143,8 @@ export async function main() {
 
   let prizeVaults: PrizeVault[] = [];
   if (useSubgraph) {
-    prizeVaults = await getPrizeVaults(selectedChainId);
+    const prizePoolInfo: PrizePoolInfo = await getPrizePoolInfo(provider, contracts);
+    prizeVaults = await getPrizeVaults(selectedChainId, prizePoolInfo);
   }
 
   if (prizeVaults.length === 0) {
@@ -164,7 +172,7 @@ export async function main() {
       const vaultUserCount = vault.accounts.length;
       console.log("Existing vault depositors count:", vaultUserCount);
 
-      const numToAdd = getRandomInt(7, 20);
+      const numToAdd = getRandomInt(60, 80);
       console.log("# of depositors to add:", numToAdd);
 
       const numUsers = vaultUserCount + numToAdd;
