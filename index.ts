@@ -172,7 +172,7 @@ export async function main() {
       const vaultUserCount = vault.accounts.length;
       console.log("Existing vault depositors count:", vaultUserCount);
 
-      const numToAdd = getRandomInt(60, 80);
+      const numToAdd = getRandomInt(30, 50);
       console.log("# of depositors to add:", numToAdd);
 
       const numUsers = vaultUserCount + numToAdd;
