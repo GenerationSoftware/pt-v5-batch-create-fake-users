@@ -122,10 +122,11 @@ export async function main() {
     tokenFaucetAddress: faucetContractData?.address.toLowerCase(),
     daiTokenAddress: erc20MintableContracts[0].address.toLowerCase(),
     usdcTokenAddress: erc20MintableContracts[1].address.toLowerCase(),
-    poolTokenAddress: erc20MintableContracts[5].address.toLowerCase(),
-    wethTokenAddress: erc20MintableContracts[4].address.toLowerCase(),
-    daiVaultAddress: prizeVaultContracts[0].address.toLowerCase(),
-    usdcVaultAddress: prizeVaultContracts[2].address.toLowerCase()
+    wethTokenAddress: erc20MintableContracts[0].address.toLowerCase(),
+    poolTokenAddress: erc20MintableContracts[1].address.toLowerCase(),
+    poolVaultAddress: prizeVaultContracts[0].address.toLowerCase(),
+    usdcVaultAddress: prizeVaultContracts[2].address.toLowerCase(),
+    daiVaultAddress: prizeVaultContracts[3].address.toLowerCase()
   };
 
   console.table(addresses);
@@ -135,7 +136,9 @@ export async function main() {
   const signer = new ethers.Wallet(privateKey, provider);
 
   if (onlyDrip) {
-    await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.usdcTokenAddress);
+    await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.wethTokenAddress);
+    await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.poolTokenAddress);
+    // await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.usdcTokenAddress);
     return;
   }
 
@@ -149,6 +152,7 @@ export async function main() {
 
   if (prizeVaults.length === 0) {
     prizeVaults = [
+      { id: addresses.poolVaultAddress, accounts: [] },
       { id: addresses.daiVaultAddress, accounts: [] },
       { id: addresses.usdcVaultAddress, accounts: [] }
     ];
@@ -163,7 +167,11 @@ export async function main() {
 
       console.log(chalk.green("Vault ID:", vault.id));
 
-      if (addresses.usdcVaultAddress !== vault.id && addresses.daiVaultAddress !== vault.id) {
+      if (
+        addresses.poolVaultAddress !== vault.id &&
+        addresses.daiVaultAddress !== vault.id &&
+        addresses.usdcVaultAddress !== vault.id
+      ) {
         console.log(chalk.yellow("Skipping vault ..."));
         console.log("");
         continue;
@@ -172,7 +180,10 @@ export async function main() {
       const vaultUserCount = vault.accounts.length;
       console.log("Existing vault depositors count:", vaultUserCount);
 
-      const numToAdd = getRandomInt(30, 50);
+      let numToAdd = 10;
+      if (vaultUserCount > 0) {
+        numToAdd = getRandomInt(30, 50);
+      }
       console.log("# of depositors to add:", numToAdd);
 
       const numUsers = vaultUserCount + numToAdd;
