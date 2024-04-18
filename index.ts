@@ -137,7 +137,7 @@ export async function main() {
 
   if (onlyDrip) {
     await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.wethTokenAddress);
-    await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.poolTokenAddress);
+    // await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.poolTokenAddress);
     // await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.usdcTokenAddress);
     return;
   }

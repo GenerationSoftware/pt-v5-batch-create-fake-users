@@ -15,8 +15,7 @@
   "scripts": {
     "create-fake:with-subgraph:optimism-sepolia": "tsx ./index.ts 11155420 false true",
     "create-fake:no-subgraph:optimism-sepolia": "tsx ./index.ts 11155420 false false",
-    "drip:optimism-sepolia": "tsx ./index.ts 11155420 true",
-    "yalcadd": "npx yalc add @generationsoftware/pt-v5-utils-js --pure"
+    "drip:optimism-sepolia": "tsx ./index.ts 11155420 true"
   },
   "bugs": {
     "url": "https://github.com/pooltogether/v5-autotasks/issues"
@@ -24,7 +23,7 @@
   "dependencies": {
     "@ethersproject/abi": "5.7.0",
     "@ethersproject/providers": "5.7.2",
-    "@generationsoftware/pt-v5-utils-js": "^1.1.0-beta.15",
+    "@generationsoftware/pt-v5-utils-js": "^1.1.0-beta.18",
     "@types/node": "^20.3.0",
     "chalk": "^5.3.0",
     "dotenv": "16.0.3",
