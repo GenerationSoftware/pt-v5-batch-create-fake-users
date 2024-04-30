@@ -15,10 +15,15 @@ import { userFakerAbi } from "./abis/userFakerAbi";
 import { ERC20Abi } from "./abis/ERC20Abi";
 
 const CHAIN_IDS = {
+  baseSepolia: 84532,
+  arbitrumSepolia: 421614,
   sepolia: 11155111,
   optimismSepolia: 11155420
 };
+
 const CHAIN_NAMES = {
+  84532: "baseSepolia",
+  421614: "arbitrumSepolia",
   11155111: "sepolia",
   11155420: "optimismSepolia"
 };
@@ -29,6 +34,8 @@ const onlyDrip = yn(process.argv[3]);
 const useSubgraph = yn(process.argv[4]);
 
 const USER_FAKER_ADDRESS = {
+  [CHAIN_IDS.baseSepolia]: "0x02ac689bb6ad0e07144a520c02e5fe3a3959dfa0",
+  [CHAIN_IDS.arbitrumSepolia]: "",
   [CHAIN_IDS.sepolia]: "0xb02bb09c774a1ecca01259f68373894f6efe7164",
   [CHAIN_IDS.optimismSepolia]: "0xbcf3095812b97b2e2cd1a1d03230b01dc326c047"
 };
@@ -37,6 +44,14 @@ const getProviderUrl = (): string | undefined => {
   let url: string | undefined = "";
 
   switch (selectedChainId) {
+    case CHAIN_IDS.baseSepolia: {
+      url = process.env.BASE_SEPOLIA_RPC_PROVIDER_URL;
+      break;
+    }
+    case CHAIN_IDS.arbitrumSepolia: {
+      url = process.env.ARBITRUM_SEPOLIA_RPC_PROVIDER_URL;
+      break;
+    }
     case CHAIN_IDS.sepolia: {
       url = process.env.SEPOLIA_RPC_PROVIDER_URL;
       break;
@@ -66,13 +81,8 @@ const getPrizeVaults = async (chainId: number, prizePoolInfo: PrizePoolInfo) => 
     throw new Error("Claimer: No prizeVaults found in subgraph");
   }
 
-  // Page through and concat all accounts with recent non-zero balance
-  // (based on current time) for all prizeVaults
-  prizeVaults = await populateSubgraphPrizeVaultAccounts(
-    chainId,
-    prizeVaults,
-    Math.floor(Date.now() / 1000)
-  );
+  // Page through and concat all accounts
+  prizeVaults = await populateSubgraphPrizeVaultAccounts(chainId, prizeVaults);
 
   return prizeVaults;
 };
@@ -118,7 +128,7 @@ export async function main() {
   );
 
   const addresses = {
-    userFakerAddress: USER_FAKER_ADDRESS[selectedChainId].toLowerCase(),
+    userFakerAddress: USER_FAKER_ADDRESS[selectedChainId]?.toLowerCase(),
     tokenFaucetAddress: faucetContractData?.address.toLowerCase(),
     daiTokenAddress: erc20MintableContracts[0].address.toLowerCase(),
     usdcTokenAddress: erc20MintableContracts[1].address.toLowerCase(),
@@ -162,46 +172,46 @@ export async function main() {
   console.log("");
 
   for (let i = 0; i < prizeVaults.length; i++) {
-    try {
-      const vault = prizeVaults[i];
+    // try {
+    const vault = prizeVaults[i];
 
-      console.log(chalk.green("Vault ID:", vault.id));
+    console.log(chalk.green("Vault ID:", vault.id));
 
-      if (
-        addresses.poolVaultAddress !== vault.id &&
-        addresses.daiVaultAddress !== vault.id &&
-        addresses.usdcVaultAddress !== vault.id
-      ) {
-        console.log(chalk.yellow("Skipping vault ..."));
-        console.log("");
-        continue;
-      }
-
-      const vaultUserCount = vault.accounts.length;
-      console.log("Existing vault depositors count:", vaultUserCount);
-
-      let numToAdd = 10;
-      if (vaultUserCount > 0) {
-        numToAdd = getRandomInt(30, 50);
-      }
-      console.log("# of depositors to add:", numToAdd);
-
-      const numUsers = vaultUserCount + numToAdd;
-      console.log("# to set vault to:", numUsers);
-
-      const transactionSentToNetwork = await userFaker.setFakeUsers(
-        vault.id,
-        Math.max(numUsers, 1),
-        addresses.tokenFaucetAddress,
-        { gasLimit: 20000000 }
-      );
-      console.log("TransactionHash:", transactionSentToNetwork.hash);
-      await transactionSentToNetwork.wait();
-
+    if (
+      addresses.poolVaultAddress !== vault.id &&
+      addresses.daiVaultAddress !== vault.id &&
+      addresses.usdcVaultAddress !== vault.id
+    ) {
+      console.log(chalk.yellow("Skipping vault ..."));
       console.log("");
-    } catch (error) {
-      throw new Error(error);
+      continue;
     }
+
+    const vaultUserCount = vault.accounts.length;
+    console.log("Existing vault depositors count:", vaultUserCount);
+
+    let numToAdd = 10;
+    if (vaultUserCount > 0) {
+      numToAdd = getRandomInt(30, 50);
+    }
+    console.log("# of depositors to add:", numToAdd);
+
+    const numUsers = vaultUserCount + numToAdd;
+    console.log("# to set vault to:", numUsers);
+
+    const transactionSentToNetwork = await userFaker.setFakeUsers(
+      vault.id,
+      Math.max(numUsers, 1),
+      addresses.tokenFaucetAddress,
+      { gasLimit: 20000000 }
+    );
+    console.log("TransactionHash:", transactionSentToNetwork.hash);
+    await transactionSentToNetwork.wait();
+
+    console.log("");
+    // } catch (error) {
+    //   throw new Error(error);
+    // }
   }
 }
 
