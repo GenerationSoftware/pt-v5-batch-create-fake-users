@@ -32,10 +32,12 @@ const selectedChainId = Number(process.argv[2]);
 const chainName = CHAIN_NAMES[selectedChainId];
 const onlyDrip = yn(process.argv[3]);
 const useSubgraph = yn(process.argv[4]);
+const contractsJsonUrl = process.argv[5];
+const subgraphUrl = process.argv[6];
 
 const USER_FAKER_ADDRESS = {
   [CHAIN_IDS.baseSepolia]: "0x02ac689bb6ad0e07144a520c02e5fe3a3959dfa0",
-  [CHAIN_IDS.arbitrumSepolia]: "",
+  [CHAIN_IDS.arbitrumSepolia]: "0xc086edda021d9b90c09bd0092d47c36879c879fb",
   [CHAIN_IDS.sepolia]: "0xb02bb09c774a1ecca01259f68373894f6efe7164",
   [CHAIN_IDS.optimismSepolia]: "0xbcf3095812b97b2e2cd1a1d03230b01dc326c047"
 };
@@ -75,21 +77,21 @@ const getProviderUrl = (): string | undefined => {
   return url;
 };
 
-const getPrizeVaults = async (chainId: number, prizePoolInfo: PrizePoolInfo) => {
-  let prizeVaults = await getSubgraphPrizeVaults(chainId);
+const getPrizeVaults = async () => {
+  let prizeVaults = await getSubgraphPrizeVaults(subgraphUrl);
   if (prizeVaults.length === 0) {
     throw new Error("Claimer: No prizeVaults found in subgraph");
   }
 
   // Page through and concat all accounts
-  prizeVaults = await populateSubgraphPrizeVaultAccounts(chainId, prizeVaults);
+  prizeVaults = await populateSubgraphPrizeVaultAccounts(subgraphUrl, prizeVaults);
 
   return prizeVaults;
 };
 
 const getContracts = async () => {
   try {
-    const contracts: ContractsBlob = await downloadContractsBlob(selectedChainId);
+    const contracts: ContractsBlob = await downloadContractsBlob(contractsJsonUrl);
     return contracts;
   } catch (error) {
     throw new Error(error);
@@ -134,9 +136,8 @@ export async function main() {
     usdcTokenAddress: erc20MintableContracts[1].address.toLowerCase(),
     wethTokenAddress: erc20MintableContracts[0].address.toLowerCase(),
     poolTokenAddress: erc20MintableContracts[1].address.toLowerCase(),
-    poolVaultAddress: prizeVaultContracts[0].address.toLowerCase(),
-    usdcVaultAddress: prizeVaultContracts[2].address.toLowerCase(),
-    daiVaultAddress: prizeVaultContracts[3].address.toLowerCase()
+    vault1Address: prizeVaultContracts[0].address.toLowerCase(),
+    vault2Address: prizeVaultContracts[2].address.toLowerCase()
   };
 
   console.table(addresses);
@@ -147,8 +148,6 @@ export async function main() {
 
   if (onlyDrip) {
     await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.wethTokenAddress);
-    // await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.poolTokenAddress);
-    // await drip(contracts, signer, addresses.tokenFaucetAddress, addresses.usdcTokenAddress);
     return;
   }
 
@@ -156,15 +155,13 @@ export async function main() {
 
   let prizeVaults: PrizeVault[] = [];
   if (useSubgraph) {
-    const prizePoolInfo: PrizePoolInfo = await getPrizePoolInfo(provider, contracts);
-    prizeVaults = await getPrizeVaults(selectedChainId, prizePoolInfo);
+    prizeVaults = await getPrizeVaults();
   }
 
   if (prizeVaults.length === 0) {
     prizeVaults = [
-      { id: addresses.poolVaultAddress, accounts: [] },
-      { id: addresses.daiVaultAddress, accounts: [] },
-      { id: addresses.usdcVaultAddress, accounts: [] }
+      { id: addresses.vault1Address, accounts: [] },
+      { id: addresses.vault2Address, accounts: [] }
     ];
   }
 
@@ -177,11 +174,7 @@ export async function main() {
 
     console.log(chalk.green("Vault ID:", vault.id));
 
-    if (
-      addresses.poolVaultAddress !== vault.id &&
-      addresses.daiVaultAddress !== vault.id &&
-      addresses.usdcVaultAddress !== vault.id
-    ) {
+    if (addresses.vault1Address !== vault.id && addresses.vault2Address !== vault.id) {
       console.log(chalk.yellow("Skipping vault ..."));
       console.log("");
       continue;
