@@ -15,15 +15,19 @@ import { userFakerAbi } from "./abis/userFakerAbi";
 import { ERC20Abi } from "./abis/ERC20Abi";
 
 const CHAIN_IDS = {
+  gnosisChiado: 10200,
   baseSepolia: 84532,
   arbitrumSepolia: 421614,
+  scrollSepolia: 534351,
   sepolia: 11155111,
   optimismSepolia: 11155420
 };
 
 const CHAIN_NAMES = {
+  10200: "gnosisChiado",
   84532: "baseSepolia",
   421614: "arbitrumSepolia",
+  534351: "scrollSepolia",
   11155111: "sepolia",
   11155420: "optimismSepolia"
 };
@@ -36,8 +40,10 @@ const contractsJsonUrl = process.argv[5];
 const subgraphUrl = process.argv[6];
 
 const USER_FAKER_ADDRESS = {
+  [CHAIN_IDS.gnosisChiado]: "0x7e1acab9273afe96571b6c59db669a1b7b914b40",
   [CHAIN_IDS.baseSepolia]: "0x02ac689bb6ad0e07144a520c02e5fe3a3959dfa0",
   [CHAIN_IDS.arbitrumSepolia]: "0xc086edda021d9b90c09bd0092d47c36879c879fb",
+  [CHAIN_IDS.scrollSepolia]: "0x8fa41112e3f3982c20a20378c8ca77bfa0ecc2a6",
   [CHAIN_IDS.sepolia]: "0xb02bb09c774a1ecca01259f68373894f6efe7164",
   [CHAIN_IDS.optimismSepolia]: "0xbcf3095812b97b2e2cd1a1d03230b01dc326c047"
 };
@@ -46,12 +52,20 @@ const getProviderUrl = (): string | undefined => {
   let url: string | undefined = "";
 
   switch (selectedChainId) {
+    case CHAIN_IDS.gnosisChiado: {
+      url = process.env.GNOSIS_CHIADO_RPC_PROVIDER_URL;
+      break;
+    }
     case CHAIN_IDS.baseSepolia: {
       url = process.env.BASE_SEPOLIA_RPC_PROVIDER_URL;
       break;
     }
     case CHAIN_IDS.arbitrumSepolia: {
       url = process.env.ARBITRUM_SEPOLIA_RPC_PROVIDER_URL;
+      break;
+    }
+    case CHAIN_IDS.scrollSepolia: {
+      url = process.env.SCROLL_SEPOLIA_RPC_PROVIDER_URL;
       break;
     }
     case CHAIN_IDS.sepolia: {
@@ -169,7 +183,6 @@ export async function main() {
   console.log("");
 
   for (let i = 0; i < prizeVaults.length; i++) {
-    // try {
     const vault = prizeVaults[i];
 
     console.log(chalk.green("Vault ID:", vault.id));
@@ -185,7 +198,7 @@ export async function main() {
 
     let numToAdd = 10;
     if (vaultUserCount > 0) {
-      numToAdd = getRandomInt(30, 50);
+      numToAdd = getRandomInt(10, 30);
     }
     console.log("# of depositors to add:", numToAdd);
 
@@ -196,15 +209,12 @@ export async function main() {
       vault.id,
       Math.max(numUsers, 1),
       addresses.tokenFaucetAddress,
-      { gasLimit: 20000000 }
+      { gasLimit: 10000000 }
     );
     console.log("TransactionHash:", transactionSentToNetwork.hash);
     await transactionSentToNetwork.wait();
 
     console.log("");
-    // } catch (error) {
-    //   throw new Error(error);
-    // }
   }
 }
 
