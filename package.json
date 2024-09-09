@@ -23,7 +23,9 @@
     "create-fake:no-subgraph:base-sepolia": "tsx ./index.ts 84532 false false",
     "drip:arbitrum-sepolia": "tsx ./index.ts 421614 true false https://raw.githubusercontent.com/GenerationSoftware/pt-v5-testnet/603b108303c4f639de5dd96005d0629c4dce1357/deployments/arbitrumSepolia/contracts.json https://api.studio.thegraph.com/query/63100/pt-v5-arbitrum-sepolia/version/latest",
     "drip:optimism-sepolia": "tsx ./index.ts 11155420 true false",
-    "drip:base-sepolia": "tsx ./index.ts 84532 true false"
+    "drip:base-sepolia": "tsx ./index.ts 84532 true false",
+    "drip:scroll-sepolia": "tsx ./index.ts 534351 true false https://raw.githubusercontent.com/GenerationSoftware/pt-v5-testnet/68c51277ed8196e27634ad8abd46ef99deeb251a/deployments/scrollSepolia/contracts.json",
+    "drip:gnosis-chiado": "tsx ./index.ts 10200 true false https://raw.githubusercontent.com/GenerationSoftware/pt-v5-testnet/25f544537f232912bc2a266c0b2a621e6772dd07/deployments/gnosisChiado/contracts.json"
   },
   "bugs": {
     "url": "https://github.com/pooltogether/v5-autotasks/issues"

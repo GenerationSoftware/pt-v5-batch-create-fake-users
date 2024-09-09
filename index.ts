@@ -187,7 +187,7 @@ export async function main() {
 
     console.log(chalk.green("Vault ID:", vault.id));
 
-    if (addresses.vault1Address !== vault.id && addresses.vault2Address !== vault.id) {
+    if (addresses.vault1Address !== vault.id) {
       console.log(chalk.yellow("Skipping vault ..."));
       console.log("");
       continue;
@@ -253,5 +253,5 @@ async function drip(contracts, signer, tokenFaucetAddress, tokenAddress) {
   console.log("Send this token to relayer.");
   console.log("");
   console.log("");
-  await delay(3000); // sleep due to nonce re-use issues (too many tx's sent at once)
+  await delay(10000); // sleep due to nonce re-use issues (too many tx's sent at once)
 }
