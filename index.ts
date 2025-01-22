@@ -196,6 +196,8 @@ export async function main() {
 
   for (let i = 0; i < prizeVaults.length; i++) {
     const vault = prizeVaults[i];
+    console.log("vault");
+    console.log(vault);
 
     console.log(chalk.green("Vault ID:", vault.id));
 
